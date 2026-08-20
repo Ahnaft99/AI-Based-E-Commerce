@@ -1,11 +1,10 @@
-import Banner from "./Components/Banner"
-import Navbar from "./Components/Navbar"
+import Home from "./Pages/Home"
+
 
 function App() {
   return (
     <>
-      <Navbar />
-      <Banner/>
+      <Home/>
     </>
   )
 }
