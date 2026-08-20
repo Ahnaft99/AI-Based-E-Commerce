@@ -12,3 +12,17 @@
 .font-poppins {
   font-family: 'Poppins', sans-serif;
 }
+
+
+
+.new-arrival-slider {
+  padding: 0 35px;
+}
+
+.new-arrival-slider .swiper-button-next {
+  right: -5px;
+}
+
+.new-arrival-slider .swiper-button-prev {
+  left: -5px;
+}
