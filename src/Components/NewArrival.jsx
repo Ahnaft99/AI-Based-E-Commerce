@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -11,10 +12,9 @@ import "swiper/css/navigation";
 
 const NewArrival = () => {
   const dispatch = useDispatch();
-
-  const { data, isLoading, isError } = useSelector(
-    (state) => state.product
-  );
+const { data, isLoading, isError, errorMessage } = useSelector(
+  (state) => state.product
+);
 
   useEffect(() => {
     dispatch(fetchProduct());
@@ -24,9 +24,9 @@ const NewArrival = () => {
     return <h2>Loading...</h2>;
   }
 
-  if (isError) {
-    return <h2>Something went wrong!</h2>;
-  }
+ if (isError) {
+  return <h2>Error: {errorMessage}</h2>;
+}
 
   return (
     <section className="py-8">
@@ -49,7 +49,7 @@ const NewArrival = () => {
             delay: 3000,
             disableOnInteraction: false,
           }}
-          loop={true}
+          loop={data.length > 4}
           breakpoints={{
             320: {
               slidesPerView: 1,
@@ -66,9 +66,13 @@ const NewArrival = () => {
           }}
         >
           {data.map((item) => {
-            const discountPrice =
-              item.price -
-              (item.price * item.discountPercentage) / 100;
+            const discountPrice = Number(item.new_price);
+            const oldPrice = Number(item.old_price);
+
+            const discountPercentage =
+              oldPrice > discountPrice
+                ? ((oldPrice - discountPrice) / oldPrice) * 100
+                : 0;
 
             return (
               <SwiperSlide key={item.id}>
@@ -80,15 +84,17 @@ const NewArrival = () => {
                   <div className="relative h-[180px] bg-gray-100 flex items-center justify-center p-4">
 
                     <img
-                      src={item.thumbnail}
-                      alt={item.title}
+                      src={item.primary_image}
+                      alt={item.name}
                       className="w-full h-full object-contain"
                     />
 
                     {/* Discount */}
-                    <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-full">
-                      -{Math.round(item.discountPercentage)}%
-                    </span>
+                    {discountPercentage > 0 && (
+                      <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-full">
+                        -{Math.round(discountPercentage)}%
+                      </span>
+                    )}
 
                   </div>
 
@@ -97,28 +103,34 @@ const NewArrival = () => {
 
                     {/* Name */}
                     <h3 className="text-[15px] font-semibold text-gray-800 line-clamp-2 min-h-[44px]">
-                      {item.title}
+                      {item.name}
                     </h3>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-1 mt-2">
-                      <span className="text-yellow-500 text-sm">
-                        ★
-                      </span>
-
-                      <span className="text-xs text-gray-500">
-                        {item.rating}
-                      </span>
-                    </div>
 
                     {/* Price */}
                     <div className="flex items-center gap-2 mt-2">
                       <span className="text-lg font-bold text-black">
-                        ${discountPrice.toFixed(2)}
+                        ৳{discountPrice.toFixed(2)}
                       </span>
 
-                      <span className="text-xs text-gray-400 line-through">
-                        ${item.price}
+                      {oldPrice > discountPrice && (
+                        <span className="text-xs text-gray-400 line-through">
+                          ৳{oldPrice.toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Stock Status */}
+                    <div className="mt-2">
+                      <span
+                        className={`text-xs font-medium ${
+                          item.is_in_stock
+                            ? "text-green-600"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {item.is_in_stock
+                          ? "In Stock"
+                          : "Out of Stock"}
                       </span>
                     </div>
 
